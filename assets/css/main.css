@@ -1,0 +1,106 @@
+body {
+    background-color: #cccccca8 !important;
+}
+
+terminal {
+    background-color: #352e2e;
+    font-family: monospace;
+    color: rgb(60, 255, 1);
+    padding: 0px;
+}
+
+input[type=text] {
+    color: rgb(179, 255, 179);
+    background-color: rgb(102, 86, 86);
+    border: 1px solid;
+    border-color: #696 #363 #363 #696;
+}
+
+[type="checkbox"] {
+    vertical-align: middle;
+}
+
+#serialResults {
+    white-space: pre;
+    height: calc(100% - 1px);
+    width: calc(100% - 20px);
+    overflow: scroll;
+    background-color: rgb(88, 92, 92);
+    padding: 10px;
+    margin: 0;
+    display: none;
+    font-family: monospace;
+    color: rgb(60, 255, 1);;
+    font-size:17px;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+
+.top {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 92px;
+    overflow: hidden;
+}
+
+.left {
+    position: absolute;
+    left: 0;
+    top: 92px;
+    bottom: 0;
+    width: 178px;
+    overflow: hidden;
+    border: 1px solid black;
+    background-color: #819d3c !important;
+    /*border-right: 0;*/
+}
+
+.main {
+    position: absolute;
+    overflow: auto;
+    left: 178px;
+    top: 92px;
+    right: 0;
+    bottom: 0;
+    padding: 20px;
+    overflow-y: scroll;
+    background-color: white;
+    border: 1px solid black;
+    border-left: 0;
+}
+
+.listnav li button {
+    display: block;
+    padding: 8px 16px;
+    padding-left: 15px;
+    text-decoration: none;
+    color: rgb(255, 255, 255);
+    border: none;
+}
+
+ul.listnav {
+    background-color: #819d3c !important;
+}
+
+button.accordion {
+    padding: 0;
+}
+
+div.-panel {
+    padding: 0 !important;
+    max-height: 100%;
+    overflow: visible !important;
+}
+
+#config_show {
+    padding-top: 60px;
+}
+
+table {
+    border: 1px solid black!important;
+    border-collapse: collapse;
+}

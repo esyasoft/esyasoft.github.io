@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.6.1.slim.min.js"
+            integrity="sha256-w8CvhFs7iHNVUtnSP0YKEg00p9Ih13rlL9zGqvLdePA=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/beauter.css">
+    <script src="/assets/js/beauter.js"></script>
+    <script src="/assets/js/port.js"></script>
+    <script src="/assets/js/main.js"></script>
+</head>
+
+<body>
+<div class="container" style="min-height:100vh">
+    <div class="top">
+        <img src="/assets/logo.png" alt="logo">
+    </div>
+    <div class="left">
+        <button class="accordion active">System</button>
+        <div class="-panel" style="max-height: 156px">
+            <ul class="listnav">
+                <li>
+                    <button onclick="gwCellularStatus()">System Information</button>
+                </li>
+                <li>
+                    <button onclick="enableLogging()">System Log</button>
+                </li>
+            </ul>
+        </div>
+        <button class="accordion active">Configuration</button>
+        <div class="-panel" style="max-height: 156px">
+            <ul class="listnav">
+                <li>
+                    <button onclick="getDataCallCfg()">Cellular</button>
+                </li>
+                <li>
+                    <button onclick="getMeterCfg()">Meter</button>
+                </li>
+                <li>
+                    <button onclick="getMqttCfg()">MQTT</button>
+                </li>
+                <li>
+                    <button onclick="getSchedularConfig()">Schedular</button>
+                </li>
+            </ul>
+        </div>
+
+        <input type="number" name="logging" id="logging" hidden="true" value=0>
+        <!-- /.-panel -->
+    </div>
+    <div class="main" id="main">
+        <div id="config_name"></div>
+        <div id="serialResults"></div>
+        <!-- /#config_name -->
+        <div id="config_show" style="display: block"></div>
+        <!-- /.config_show -->
+    </div>
+</div>
+<script src="https://rawgit.com/outboxcraft/beauter/master/beauter.min.js">
+</script>
+</body>
+</html>
+
+<script>
+    const serialResultsDiv = document.getElementById("serialResults");
+
+    const edit_map = {
+        "edit_schedular": "createSchedularForm(schedularConfig)",
+        "edit_mqtt": "createMqttForm(mqttConfig)",
+        "edit_datacall": "createDataCallForm(datacallConfig)",
+        "edit_meter": "createMeterForm(meterConfig)"
+    }
+
+    document.addEventListener('click', function (e) {
+        eval(edit_map[e.target.id]);
+    });
+
+    window.onload = function () {
+        yourFunction(param1, param2);
+    };
+</script>
