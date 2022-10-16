@@ -17,8 +17,10 @@
 
 <body>
 <div class="container" style="min-height:100vh">
-    <div class="top">
-        <img src="/assets/logo.png" alt="logo">
+    <div class="top"><p id="time">
+
+        <img src="/assets/logo.png" alt="logo"></img>
+    </p>
     </div>
     <div class="left">
         <button class="accordion active">System</button>
@@ -76,10 +78,27 @@
         "edit_meter": "createMeterForm(meterConfig)"
     }
 
+    const submit_map = {
+        // "update_schedular": "createSchedularForm(schedularConfig)",
+        "update_mqtt": "updateMqttConfig(mqttConfig)",
+        "update_datacall": "updateDataCallConfig()",
+        // "update_meter": "createMeterForm(meterConfig)"
+    }
+
     document.addEventListener('click', function (e) {
         eval(edit_map[e.target.id]);
+        eval(submit_map[e.target.id]);
     });
 
+    var timeDisplay = document.getElementById("time");
+
+    function refreshTime() {
+        var dateString = new Date().toLocaleString("en-US", {timeZone: "America/Sao_Paulo"});
+        var formattedString = dateString.replace(", ", " - ");
+        timeDisplay.innerHTML = formattedString;
+    }
+
+    setInterval(refreshTime, 1000);
     window.onload = function () {
         yourFunction(param1, param2);
     };

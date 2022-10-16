@@ -25,6 +25,17 @@ async function sendSerialLine(dataToSend) {
     dataToSend = dataToSend + "\r";
     dataToSend = dataToSend + "\n";
     await writer.write(dataToSend);
+    return;
+}
+
+async function sendCharLine(str) {
+    for (var i = 0, charsLength = str.length; i < charsLength; i += 1023) {
+        await writer.write(str.substring(i, i + 1023));
+        console.log('SENT:', str.substring(i, i + 1023));
+        await delay(0.001);
+    }
+    await writer.write('`');
+    return;
 }
 
 async function listenToPort() {
@@ -50,7 +61,7 @@ let keepReadingConfig = 0;
 
 async function appendToTerminal(newStuff) {
     var logging = document.getElementById('logging').value;
-
+    console.log('[ ' + newStuff + ' ]\n');
     readData += newStuff;
     if (keepReadingConfig === 1) {
         if (newStuff.includes('\r\n')) {

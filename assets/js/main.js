@@ -189,12 +189,11 @@ function createForm(data, form) {
             } else {
                 input.type = 'text';
             }
-            input.id = kvmap[key];
+            input.id = key;
             input.value = data[i][key];
             input.className = "form-control";
             form.appendChild(label);
             form.appendChild(input);
-            // form.appendChild(linebreak);
         }
     }
     return form;
@@ -206,6 +205,15 @@ function addEditButton(key) {
     button.innerHTML = "Edit";
     button.id = "edit_" + key;
     document.getElementById('config_name').appendChild(button);
+    return button;
+}
+
+function addSubmitButton(key) {
+    let button = document.createElement("button");
+    button.className = "button";
+    button.innerHTML = "Update";
+    button.id = "update_" + key;
+    // document.getElementById('config_name').appendChild(button);
     return button;
 }
 
@@ -234,7 +242,6 @@ function createSchedularTable(data) {
 function createSchedularForm(data) {
     clearContent();
     let form = document.createElement('form');
-    let linebreak = document.createElement("br");
     data = JSON.parse(data);
     data = data['scheduler_cfg'];
     form = createForm(data, form);
@@ -267,28 +274,9 @@ function createMqttTable(data) {
 
 function createMqttForm(data) {
     let form = document.createElement('form');
+    form.id = "form_mqtt";
     data_ = JSON.parse(data);
     data = data_['mqtt'][0];
-    for (key in data) {
-        if (key === "id") {
-            continue;
-        }
-        let label = document.createElement('label');
-        let input = document.createElement('input');
-        label.innerHTML = kvmap[key];
-        label.className = "form-label";
-        if (typeof (data[key]) == 'number') {
-            input.type = 'number';
-        } else {
-            input.type = 'text';
-        }
-        input.id = kvmap[key];
-        input.value = data[key];
-        input.className = "form-control";
-        form.appendChild(label);
-        form.appendChild(input);
-    }
-    data = data_['mqtt_topics'][0];
     for (key in data) {
         if (key === "id") {
             continue;
@@ -311,6 +299,25 @@ function createMqttForm(data) {
     clearContent();
     console.log(form);
     document.getElementById('config_show').appendChild(form);
+}
+
+async function updateMqttConfig() {
+    let form = document.getElementById('form_datacall');
+    let mainObj = new Object();
+    let obj = {}, arr = [];
+    obj.id = 0;
+    for (let {id, value} of form) {
+        obj[id] = value;
+    }
+    arr[0] = obj;
+    mainObj.mqtt = arr;
+    arr[0] = JSON.parse(mqttConfig)['mqtt_topics'];
+    mainObj.mqtt_topics = arr;
+    console.log(JSON.stringify(mainObj));
+    let data = JSON.stringify(mainObj);
+    await sendSerialLine('config_upload mqtt');
+    await sendCharLine(data);
+    await console.log('DONE UPDATING CONFIG');
 }
 
 /*DataCall*/
@@ -336,33 +343,34 @@ function createDataCallTable(data) {
 }
 
 function createDataCallForm(data) {
-    let form = document.createElement('form');
-    let linebreak = document.createElement("br");
-    data_ = JSON.parse(data);
-    data = data_['data_call'][0];
-    for (key in data) {
-        if (key === "id") {
-            continue;
-        }
-        let label = document.createElement('label');
-        let input = document.createElement('input');
-        label.innerHTML = kvmap[key];
-        label.className = "form-label";
-        if (typeof (data[key]) == 'number') {
-            input.type = 'number';
-        } else {
-            input.type = 'text';
-        }
-        input.id = kvmap[key];
-        input.value = data[key];
-        input.className = "form-control";
-        form.appendChild(label);
-        form.appendChild(input);
-    }
-
     clearContent();
-    console.log(form);
+    let form = document.createElement('form');
+    form.id = "form_datacall";
+    data_ = JSON.parse(data);
+    data = data_['data_call'];
+    form = createForm(data, form);
+    let button = addSubmitButton("datacall");
     document.getElementById('config_show').appendChild(form);
+    document.getElementById('config_show').appendChild(button);
+
+}
+
+async function updateDataCallConfig() {
+    let form = document.getElementById('form_datacall');
+    let mainObj = new Object();
+    let obj = {}, arr = [];
+    obj.id = 0;
+    for (let {id, value} of form) {
+        obj[id] = value;
+    }
+    arr[0] = obj;
+    mainObj.data_call = arr;
+    console.log(JSON.stringify(mainObj));
+    let data = JSON.stringify(mainObj);
+    await sendSerialLine('config_upload datacall');
+    await sendCharLine(data);
+    await delay(2);
+    await console.log('DONE UPDATING CONFIG');
 }
 
 /*Meter Configuration*/
@@ -421,6 +429,7 @@ function createMeterForm(data) {
 
 /*Gateway Related Function*/
 let obj = {};
+
 function parseJSON(object) {
     for (let key in object) {
         let value = object[key];

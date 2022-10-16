@@ -10,7 +10,7 @@ terminal {
 }
 
 input[type=text] {
-    color: rgb(179, 255, 179);
+    color: black;
     background-color: rgb(102, 86, 86);
     border: 1px solid;
     border-color: #696 #363 #363 #696;
