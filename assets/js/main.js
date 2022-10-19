@@ -1,4 +1,4 @@
-let edit_btn;
+let edit_btn, connectButton;
 let schedularConfig = "", mqttConfig = "", datacallConfig = "", meterConfig = "";
 let cellular_info = "";
 const kvmap = {
@@ -128,15 +128,23 @@ const kvmap = {
     "typeCommunication": "Type Of Communication",
     "networkIP": "Network IP",
     "firmwareVersion": "Firmware Version",
-    "time": "Time"
+    "time": "Time",
+    "esn": "USN",
+    "product_version": "Product"
 }
 
-function sendCliCommand(command) {
-    if (!port) {
-        connectSerial(command);
-        return;
+function createJSONfromForm(form, key) {
+    let mainObj = {};
+    let obj = {}, arr = [];
+    obj.id = 0;
+    for (let {id, value} of form) {
+        if (isNaN(value) || value === "") obj[id] = value;
+        else obj[id] = parseInt(value);
     }
-    sendSerialLine(command);
+    arr[0] = obj;
+    mainObj[key] = arr;
+    // console.log(JSON.stringify(mainObj));
+    return JSON.stringify(mainObj);
 }
 
 function addNewLines(str) {
@@ -161,12 +169,15 @@ function getTable(data, tbody) {
             if (key === "id") {
                 continue;
             }
+            let val = data[i][key];
             let tr = document.createElement('tr');
             let td1 = document.createElement('td');
             let td2 = document.createElement('td');
             td1.innerText = kvmap[key];
             tr.appendChild(td1);
-            td2.innerHTML = data[i][key];
+            if (DROPDOWN_KEYS.includes(key)) {
+                td2.innerHTML = eval(key)[val];
+            } else td2.innerHTML = val;
             tr.appendChild(td2);
             tbody.appendChild(tr);
         }
@@ -174,49 +185,100 @@ function getTable(data, tbody) {
     return tbody;
 }
 
-function createForm(data, form) {
+function createOptions(key, value, list) {
+    let select = document.createElement('select');
+    select.id = key;
+    for (let i in list) {
+        let is_selected = (i == value);
+        select.add(new Option(list[i], i, false, is_selected));
+    }
+    return select;
+}
+
+function createSelectList(key, value, fieldset) {
+    switch (key) {
+        case "custom_apn":
+            fieldset.appendChild(createOptions(key, value, custom_apn));
+            return fieldset;
+
+        case "net_pref":
+            fieldset.appendChild(createOptions(key, value, net_pref));
+            return fieldset;
+
+        case "net_scan_seq":
+            fieldset.appendChild(createOptions(key, value, net_scan_seq));
+            return fieldset;
+
+        case "ssl_enabled":
+            fieldset.appendChild(createOptions(key, value, ssl_enabled));
+            return fieldset;
+    }
+}
+
+function createForm(data, fieldset) {
     for (let i = 0; i < data.length; i++) {
         for (key in data[i]) {
-            if (key === "id") {
+            if (read_only.indexOf(key) > -1) {
                 continue;
             }
             let label = document.createElement('label');
             let input = document.createElement('input');
+            let val = data[i][key];
             label.innerHTML = kvmap[key];
             label.className = "form-label";
-            if (typeof (data[i][key]) == 'number') {
-                input.type = 'number';
+            input.id = key;
+            input.className = "_width50";
+            fieldset.appendChild(label);
+
+            if (typeof (val) == 'number') {
+                if (["custom_apn", "net_pref", "net_scan_seq", "ssl_enabled"].indexOf(key) !== -1) {
+                    fieldset = createSelectList(key, val, fieldset);
+                } else {
+                    input.type = 'number';
+                    input.value = parseInt(val);
+                    fieldset.appendChild(input);
+                }
             } else {
                 input.type = 'text';
+                input.value = val;
+                fieldset.appendChild(input);
             }
-            input.id = key;
-            input.value = data[i][key];
-            input.className = "form-control";
-            form.appendChild(label);
-            form.appendChild(input);
+            // form.appendChild(label);
+            // form.appendChild(input);
         }
     }
-    return form;
+    return fieldset;
 }
 
-function addEditButton(key) {
+function addButton(operation, id) {
     let button = document.createElement("button");
     button.className = "button";
-    button.innerHTML = "Edit";
-    button.id = "edit_" + key;
-    document.getElementById('config_name').appendChild(button);
-    return button;
+    if (operation === "edit") {
+        button.innerHTML = "Edit";
+        button.id = "edit_" + id;
+        return button;
+    }
+    if (operation === "update") {
+        button.innerHTML = "Update";
+        button.id = "update_" + id;
+        return button;
+    }
+    if (operation === "reset") {
+        button.innerHTML = "Reset";
+        button.id = "reset_" + id;
+        return button;
+    }
 }
 
 function addSubmitButton(key) {
     let button = document.createElement("button");
     button.className = "button";
     button.innerHTML = "Update";
-    button.id = "update_" + key;
     // document.getElementById('config_name').appendChild(button);
     return button;
 }
 
+//Schedular Config
 function getSchedularConfig() {
     schedularConfig = '';
     let command = "config_show schedular";
@@ -226,29 +288,47 @@ function getSchedularConfig() {
 }
 
 function createSchedularTable(data) {
+    clearContent();
     let table = document.createElement('table');
     table.className = "_width100";
     let tbody = document.createElement('tbody');
-    data = JSON.parse(data);
-    data = data['scheduler_cfg'];
+    data = JSON.parse(data)['scheduler_cfg'];
     tbody = getTable(data, tbody);
     table.appendChild(tbody);
-    clearContent();
-    btn = addEditButton("schedular");
+    let button = addButton("edit", "schedular");
+    let config_name = document.getElementById('config_name');
+    config_name.appendChild(button);
     document.getElementById('config_show').appendChild(table);
-    edit_btn = document.getElementById(btn.id);
 }
 
 function createSchedularForm(data) {
     clearContent();
     let form = document.createElement('form');
+    let fieldset = document.createElement('fieldset');
+    let legend = document.createElement('legend');
+    form.id = "form_schedular";
+    fieldset.appendChild(legend);
+
     data = JSON.parse(data);
     data = data['scheduler_cfg'];
-    form = createForm(data, form);
+    fieldset = createForm(data, fieldset);
+    form.appendChild(fieldset);
+
+    let button = addButton("update", "schedular");
     document.getElementById('config_show').appendChild(form);
+    document.getElementById('config_show').appendChild(button);
 }
 
-/*MQTT*/
+async function updateSchedularConfig() {
+    showsnackbar("wait", 1000);
+    let form = document.getElementById('form_schedular');
+    let data = createJSONfromForm(form, 'scheduler_cfg');
+    await sendSerialLine('config_upload schedular');
+    await sendCharLine(data);
+    await console.log('DONE UPDATING CONFIG');
+}
+
+//MQTT Config
 function getMqttCfg() {
     mqttConfig = '';
     let command = "config_show mqtt";
@@ -262,57 +342,45 @@ function createMqttTable(data) {
     table.className = "_width100";
     let tbody = document.createElement('tbody');
     data_ = JSON.parse(data);
-    data = data_['mqtt']
+    data = data_['mqtt'];
     tbody = getTable(data, tbody);
     data = data_['mqtt_topics'];
     tbody = getTable(data, tbody);
     table.appendChild(tbody);
     clearContent();
-    addEditButton("mqtt");
+    let button = addButton("edit", "mqtt");
+    let config_name = document.getElementById('config_name');
+    config_name.appendChild(button);
     document.getElementById('config_show').appendChild(table);
 }
 
 function createMqttForm(data) {
-    let form = document.createElement('form');
-    form.id = "form_mqtt";
-    data_ = JSON.parse(data);
-    data = data_['mqtt'][0];
-    for (key in data) {
-        if (key === "id") {
-            continue;
-        }
-        let label = document.createElement('label');
-        let input = document.createElement('input');
-        label.innerHTML = kvmap[key];
-        label.className = "form-label";
-        if (typeof (data[key]) == 'number') {
-            input.type = 'number';
-        } else {
-            input.type = 'text';
-        }
-        input.id = kvmap[key];
-        input.value = data[key];
-        input.className = "form-control";
-        form.appendChild(label);
-        form.appendChild(input);
-    }
     clearContent();
-    console.log(form);
+    let form = document.createElement('form');
+    let fieldset = document.createElement('fieldset');
+    let legend = document.createElement('legend');
+    legend.innerHTML = "MQTT";
+    fieldset.appendChild(legend);
+    form.id = "form_mqtt";
+    let data_ = JSON.parse(data)['mqtt'];
+    fieldset = createForm(data_, fieldset);
+    let button = addButton("update", "mqtt");
+    form.appendChild(fieldset);
     document.getElementById('config_show').appendChild(form);
+    document.getElementById('config_show').appendChild(button);
 }
 
 async function updateMqttConfig() {
-    let form = document.getElementById('form_datacall');
-    let mainObj = new Object();
-    let obj = {}, arr = [];
-    obj.id = 0;
+    showsnackbar("wait", 1000);
+    let form = document.getElementById('form_mqtt');
+    let mainObj = {};
+    let mqtt_obj = JSON.parse(mqttConfig)['mqtt'];
     for (let {id, value} of form) {
-        obj[id] = value;
+        if (isNaN(value) || value === "") mqtt_obj[0][id] = value;
+        else mqtt_obj[0][id] = parseInt(value);
     }
-    arr[0] = obj;
-    mainObj.mqtt = arr;
-    arr[0] = JSON.parse(mqttConfig)['mqtt_topics'];
-    mainObj.mqtt_topics = arr;
+    mainObj.mqtt = mqtt_obj;
+    mainObj.mqtt_topics = JSON.parse(mqttConfig)['mqtt_topics'];
     console.log(JSON.stringify(mainObj));
     let data = JSON.stringify(mainObj);
     await sendSerialLine('config_upload mqtt');
@@ -320,7 +388,7 @@ async function updateMqttConfig() {
     await console.log('DONE UPDATING CONFIG');
 }
 
-/*DataCall*/
+//Data Call Config
 function getDataCallCfg() {
     datacallConfig = '';
     let command = "config_show datacall"
@@ -338,42 +406,40 @@ function createDataCallTable(data) {
     tbody = getTable(data, tbody);
     table.appendChild(tbody);
     clearContent();
-    addEditButton("datacall");
+    let config_name = document.getElementById('config_name');
+    config_name.appendChild(addButton("edit", "datacall"));
+    config_name.appendChild(addButton("reset", "datacall"));
     document.getElementById('config_show').appendChild(table);
 }
 
 function createDataCallForm(data) {
     clearContent();
     let form = document.createElement('form');
+    let fieldset = document.createElement('fieldset');
+    let legend = document.createElement('legend');
+    let button = addButton("update", "datacall");
+    button.disabled = true;
+    legend.innerHTML = "Cellular";
+    fieldset.appendChild(legend);
     form.id = "form_datacall";
-    data_ = JSON.parse(data);
-    data = data_['data_call'];
-    form = createForm(data, form);
-    let button = addSubmitButton("datacall");
+    let data_ = JSON.parse(data)['data_call'];
+    fieldset = createForm(data_, fieldset);
+    form.appendChild(fieldset);
     document.getElementById('config_show').appendChild(form);
     document.getElementById('config_show').appendChild(button);
 
 }
 
 async function updateDataCallConfig() {
+    showsnackbar("wait", 1000);
     let form = document.getElementById('form_datacall');
-    let mainObj = new Object();
-    let obj = {}, arr = [];
-    obj.id = 0;
-    for (let {id, value} of form) {
-        obj[id] = value;
-    }
-    arr[0] = obj;
-    mainObj.data_call = arr;
-    console.log(JSON.stringify(mainObj));
-    let data = JSON.stringify(mainObj);
+    let data = createJSONfromForm(form, 'data_call');
     await sendSerialLine('config_upload datacall');
     await sendCharLine(data);
-    await delay(2);
     await console.log('DONE UPDATING CONFIG');
 }
 
-/*Meter Configuration*/
+//Meter Configuration
 function getMeterCfg() {
     meterConfig = '';
     let command = "config_show meter";
@@ -396,7 +462,7 @@ function createMeterTable(data) {
     tbody = getTable(data, tbody);
     table.appendChild(tbody);
     clearContent();
-    addEditButton("meter");
+    // addEditButton("meter");
     document.getElementById('config_show').appendChild(table);
 }
 
@@ -427,7 +493,7 @@ function createMeterForm(data) {
     document.getElementById('config_show').appendChild(form);
 }
 
-/*Gateway Related Function*/
+//Gateway Related Function
 let obj = {};
 
 function parseJSON(object) {
@@ -465,7 +531,7 @@ function createCellularInfoTable(data) {
     document.getElementById('config_show').appendChild(table);
 }
 
-/*enable logging*/
+//Enable Logging
 function enableLogging() {
     let command = "enable_logging";
     clearContent();
@@ -474,7 +540,7 @@ function enableLogging() {
     sendCliCommand(command);
 }
 
-/*disable logging*/
+//Disable Logging
 function disableLogging() {
     let command = "disable_logging";
     sendSerialLine(command);
@@ -482,10 +548,12 @@ function disableLogging() {
     hideDivByID('serialResults');
 }
 
+//Show the "Div"
 function showDivByID(div) {
     document.getElementById(div).style.display = "block";
 }
 
+//Hide the "Div"
 function hideDivByID(div) {
     document.getElementById(div).style.display = "none";
 }

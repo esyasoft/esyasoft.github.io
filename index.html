@@ -13,17 +13,24 @@
     <script src="/assets/js/beauter.js"></script>
     <script src="/assets/js/port.js"></script>
     <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/init.js"></script>
+
 </head>
 
 <body>
 <div class="container" style="min-height:100vh">
-    <div class="top"><p id="time">
-
-        <img src="/assets/logo.png" alt="logo"></img>
-    </p>
+    <div class="top">
+        <ul class="topnav">
+            <li><img src="/assets/logo.png" alt="logo"></li>
+            <!--            <li><p id="time"></p></li>-->
+            <li><p id="port_status"></p></li>
+            <li style="float:right">
+                <button id="connect" class="_success">Connect</button>
+            </li>
+        </ul>
     </div>
     <div class="left">
-        <button class="accordion active">System</button>
+        <button class="accordion active" disabled>System</button>
         <div class="-panel" style="max-height: 156px">
             <ul class="listnav">
                 <li>
@@ -56,6 +63,18 @@
         <!-- /.-panel -->
     </div>
     <div class="main" id="main">
+        <div id="updated" class="snackbar" style="background-color: green">
+            SUCCESS.
+        </div>
+        <div id="notUpdated" class="snackbar" style="background-color: red">
+            ERROR.
+        </div>
+        <div id="wait" class="snackbar" style="background-color: yellow">
+            Please Wait.
+        </div>
+        <div id="reset_done" class="snackbar" style="background-color: green">
+            Configuration reset successful.
+        </div>
         <div id="config_name"></div>
         <div id="serialResults"></div>
         <!-- /#config_name -->
@@ -63,7 +82,7 @@
         <!-- /.config_show -->
     </div>
 </div>
-<script src="https://rawgit.com/outboxcraft/beauter/master/beauter.min.js">
+<!--<script src="https://rawgit.com/outboxcraft/beauter/master/beauter.min.js">-->
 </script>
 </body>
 </html>
@@ -79,27 +98,47 @@
     }
 
     const submit_map = {
-        // "update_schedular": "createSchedularForm(schedularConfig)",
-        "update_mqtt": "updateMqttConfig(mqttConfig)",
+        "update_schedular": "updateSchedularConfig()",
+        "update_mqtt": "updateMqttConfig()",
         "update_datacall": "updateDataCallConfig()",
         // "update_meter": "createMeterForm(meterConfig)"
     }
 
+    const reset_map = {
+        "reset_schedular": "reset_config('schedular')",
+        "reset_mqtt": "reset_config('mqtt')",
+        "reset_datacall": "reset_config('datacall')",
+    }
+
     document.addEventListener('click', function (e) {
-        eval(edit_map[e.target.id]);
-        eval(submit_map[e.target.id]);
+        eval((edit_map[e.target.id] || submit_map[e.target.id] || reset_map[e.target.id]));
+        if (e.target.id === "connect") {
+            if (port) disconnectSerial();
+            else connectSerial();
+        }
+        update_btn = document.querySelectorAll(`[id^="update_"]`);
+        input_fields = document.querySelectorAll("input,select");
+        console.log('ip_fields', input_fields);
+        input_change();
+
     });
+
+    function input_change() {
+        input_fields.forEach(ip_field => {
+            ip_field.addEventListener('input', function (evt) {
+                update_btn[0].disabled = false;
+            });
+        });
+    }
 
     var timeDisplay = document.getElementById("time");
 
     function refreshTime() {
-        var dateString = new Date().toLocaleString("en-US", {timeZone: "America/Sao_Paulo"});
+        var dateString = new Date().toLocaleString("en-US", {timeZone: "Asia/Dubai"});
         var formattedString = dateString.replace(", ", " - ");
         timeDisplay.innerHTML = formattedString;
     }
 
-    setInterval(refreshTime, 1000);
-    window.onload = function () {
-        yourFunction(param1, param2);
-    };
+    // setInterval(refreshTime, 1000);
+
 </script>

@@ -31,7 +31,7 @@ input[type=text] {
     display: none;
     font-family: monospace;
     color: rgb(60, 255, 1);;
-    font-size:17px;
+    font-size: 17px;
 }
 
 ::-webkit-scrollbar {
@@ -101,6 +101,22 @@ div.-panel {
 }
 
 table {
-    border: 1px solid black!important;
+    border: 1px solid black !important;
     border-collapse: collapse;
+}
+
+ul.topnav {
+    background-color: #ddd !important;
+}
+
+button#connect {
+    margin-top: 30px;
+}
+
+legend {
+    font-size: 35px;
+}
+
+fieldset {
+    padding-left: 35px !important;
 }

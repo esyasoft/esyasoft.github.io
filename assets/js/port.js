@@ -1,5 +1,7 @@
 var port, textEncoder, writableStreamClosed, writer, historyIndex = -1;
 const lineHistory = [];
+var reader, readableStreamClosed, textDecoder;
+
 
 async function connectSerial(cmd) {
     try {
@@ -8,6 +10,12 @@ async function connectSerial(cmd) {
         await port.open({baudRate: 115200});
         let settings = {};
         if (Object.keys(settings).length > 0) await port.setSignals(settings);
+        connectButton = document.getElementById("connect");
+        connectButton.textContent = "Disconnect";
+        connectButton.className = "_danger";
+        let portStatus = document.getElementById('port_status');
+        portStatus.innerHTML = "CONNECTED";
+        portStatus.style.color = "green";
         textEncoder = new TextEncoderStream();
         writableStreamClosed = textEncoder.readable.pipeTo(port.writable);
         writer = textEncoder.writable.getWriter();
@@ -29,19 +37,19 @@ async function sendSerialLine(dataToSend) {
 }
 
 async function sendCharLine(str) {
-    for (var i = 0, charsLength = str.length; i < charsLength; i += 1023) {
-        await writer.write(str.substring(i, i + 1023));
-        console.log('SENT:', str.substring(i, i + 1023));
-        await delay(0.001);
+    for (var i = 0, charsLength = str.length; i < charsLength; i += 200) {
+        await writer.write(str.substring(i, i + 200));
+        console.log('SENT: ==', str.substring(i, i + 200));
+        await delay(0.1);
     }
     await writer.write('`');
     return;
 }
 
 async function listenToPort() {
-    const textDecoder = new TextDecoderStream();
-    const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
-    const reader = textDecoder.readable.getReader();
+    textDecoder = new TextDecoderStream();
+    readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
+    reader = textDecoder.readable.getReader();
     // Listen to data coming from the serial device.
     while (true) {
         const {value, done} = await reader.read();
@@ -56,12 +64,46 @@ async function listenToPort() {
     }
 }
 
+async function disconnectSerial() {
+    const localPort = port;
+    port = undefined;
+    // keepReading=0;
+    // console.log(keepReading, localPort);
+    console.log('Reader', reader);
+    console.log('WritableStream', writableStreamClosed);
+    if (reader) {
+        await reader.cancel();
+        await readableStreamClosed.catch(() => { /* Ignore the error */
+        });
+        writer.close();
+        await writableStreamClosed;
+    }
+
+    if (localPort) {
+        try {
+            let portStatus = document.getElementById('port_status');
+            await localPort.close();
+            console.log('Disconnected');
+            connectButton.textContent = "Connect";
+            connectButton.className = "_success";
+            portStatus.innerHTML = "DISCONNECTED";
+            portStatus.style.color = "red";
+        } catch (e) {
+            console.error(e);
+        }
+    }
+}
+
 let readData;
 let keepReadingConfig = 0;
 
 async function appendToTerminal(newStuff) {
     var logging = document.getElementById('logging').value;
-    console.log('[ ' + newStuff + ' ]\n');
+    // console.log('[ ' + newStuff + ' ]\n');
+    if (newStuff.includes('updated successfully.')) showsnackbar('updated', 3000);
+    if (newStuff.includes('Try Again.')) showsnackbar('notUpdated', 3000);
+    if (newStuff.includes('restored to default successfully')) showsnackbar('reset_done', 3000);
+
     readData += newStuff;
     if (keepReadingConfig === 1) {
         if (newStuff.includes('\r\n')) {
@@ -76,7 +118,6 @@ async function appendToTerminal(newStuff) {
         if (newStuff.includes('\r\n')) {
             schedularConfig += removeWhitespaces(newStuff);
             keepReadingConfig = 0;
-            console.log(schedularConfig);
             createSchedularTable((schedularConfig));
             return;
         }
@@ -111,7 +152,7 @@ async function appendToTerminal(newStuff) {
     if (newStuff.includes('config_show mqtt')) {
         keepReadingConfig = 1;
     }
-    if (newStuff.includes('schedular')) {
+    if (newStuff.includes('config_show schedular')) {
         keepReadingConfig = 2;
     }
     if (newStuff.includes('config_show datacall')) {
@@ -147,4 +188,17 @@ function delay(n) {
     return new Promise(function (resolve) {
         setTimeout(resolve, n * 1000);
     });
+}
+
+function reset_config(config_name) {
+    let command = 'config_default ' + config_name;
+    sendCliCommand(command);
+}
+
+function sendCliCommand(command) {
+    if (!port) {
+        connectSerial(command);
+        return;
+    }
+    sendSerialLine(command);
 }
