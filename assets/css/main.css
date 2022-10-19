@@ -109,8 +109,9 @@ ul.topnav {
     background-color: #ddd !important;
 }
 
-button#connect {
+button#connect, button#restart_device {
     margin-top: 30px;
+    margin-left: 10px;
 }
 
 legend {
@@ -119,4 +120,8 @@ legend {
 
 fieldset {
     padding-left: 35px !important;
+}
+
+#port_status {
+    float: right;
 }

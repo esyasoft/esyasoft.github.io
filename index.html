@@ -23,11 +23,16 @@
         <ul class="topnav">
             <li><img src="/assets/logo.png" alt="logo"></li>
             <!--            <li><p id="time"></p></li>-->
-            <li><p id="port_status"></p></li>
             <li style="float:right">
                 <button id="connect" class="_success">Connect</button>
             </li>
+            <li style="float:right">
+                <button id="restart_device" class="_danger" onclick="sendCliCommand('restart_device')">Reboot Device
+                </button>
+            </li>
         </ul>
+        <span id="port_status"></span>
+
     </div>
     <div class="left">
         <button class="accordion active" disabled>System</button>
@@ -110,26 +115,26 @@
         "reset_datacall": "reset_config('datacall')",
     }
 
-    document.addEventListener('click', function (e) {
+    document.addEventListener('click', async function (e) {
         eval((edit_map[e.target.id] || submit_map[e.target.id] || reset_map[e.target.id]));
         if (e.target.id === "connect") {
-            if (port) disconnectSerial();
-            else connectSerial();
+            if (port) await disconnectSerial();
+            else await connectSerial();
         }
-        update_btn = document.querySelectorAll(`[id^="update_"]`);
-        input_fields = document.querySelectorAll("input,select");
-        console.log('ip_fields', input_fields);
-        input_change();
+        // update_btn = document.querySelectorAll(`[id^="update_"]`);
+        // input_fields = document.querySelectorAll("input,select");
+        // console.log('ip_fields', input_fields);
+        // input_change();
 
     });
 
-    function input_change() {
-        input_fields.forEach(ip_field => {
-            ip_field.addEventListener('input', function (evt) {
-                update_btn[0].disabled = false;
-            });
-        });
-    }
+    // function input_change() {
+    //     input_fields.forEach(ip_field => {
+    //         ip_field.addEventListener('input', function (evt) {
+    //             update_btn[0].disabled = false;
+    //         });
+    //     });
+    // }
 
     var timeDisplay = document.getElementById("time");
 

@@ -166,10 +166,11 @@ function removeWhitespaces(data) {
 function getTable(data, tbody) {
     for (let i = 0; i < data.length; i++) {
         for (let key in data[i]) {
-            if (key === "id") {
+            if (key === "id" || key === "time") {
                 continue;
             }
             let val = data[i][key];
+            if (val === "") val = "NULL";
             let tr = document.createElement('tr');
             let td1 = document.createElement('td');
             let td2 = document.createElement('td');
@@ -295,9 +296,10 @@ function createSchedularTable(data) {
     data = JSON.parse(data)['scheduler_cfg'];
     tbody = getTable(data, tbody);
     table.appendChild(tbody);
-    let button = addButton("edit", "schedular");
     let config_name = document.getElementById('config_name');
-    config_name.appendChild(button);
+    config_name.appendChild(addButton("edit", "schedular"));
+    config_name.appendChild(addButton("reset", "schedular"));
+
     document.getElementById('config_show').appendChild(table);
 }
 
@@ -307,25 +309,28 @@ function createSchedularForm(data) {
     let fieldset = document.createElement('fieldset');
     let legend = document.createElement('legend');
     form.id = "form_schedular";
+    legend.innerHTML = "Schedular";
     fieldset.appendChild(legend);
-
     data = JSON.parse(data);
     data = data['scheduler_cfg'];
     fieldset = createForm(data, fieldset);
     form.appendChild(fieldset);
 
     let button = addButton("update", "schedular");
+    button.style.backgroundColor = "green";
+    button.style.color = "white";
     document.getElementById('config_show').appendChild(form);
     document.getElementById('config_show').appendChild(button);
 }
 
 async function updateSchedularConfig() {
-    showsnackbar("wait", 1000);
+    showsnackbar("wait", 600);
     let form = document.getElementById('form_schedular');
     let data = createJSONfromForm(form, 'scheduler_cfg');
     await sendSerialLine('config_upload schedular');
     await sendCharLine(data);
     await console.log('DONE UPDATING CONFIG');
+    setTimeout(getSchedularConfig(), 7000);
 }
 
 //MQTT Config
@@ -348,9 +353,10 @@ function createMqttTable(data) {
     tbody = getTable(data, tbody);
     table.appendChild(tbody);
     clearContent();
-    let button = addButton("edit", "mqtt");
     let config_name = document.getElementById('config_name');
-    config_name.appendChild(button);
+    config_name.appendChild(addButton("edit", "mqtt"));
+    config_name.appendChild(addButton("reset", "mqtt"));
+
     document.getElementById('config_show').appendChild(table);
 }
 
@@ -365,13 +371,15 @@ function createMqttForm(data) {
     let data_ = JSON.parse(data)['mqtt'];
     fieldset = createForm(data_, fieldset);
     let button = addButton("update", "mqtt");
+    button.style.backgroundColor = "green";
+    button.style.color = "white";
     form.appendChild(fieldset);
     document.getElementById('config_show').appendChild(form);
     document.getElementById('config_show').appendChild(button);
 }
 
 async function updateMqttConfig() {
-    showsnackbar("wait", 1000);
+    showsnackbar("wait", 600);
     let form = document.getElementById('form_mqtt');
     let mainObj = {};
     let mqtt_obj = JSON.parse(mqttConfig)['mqtt'];
@@ -385,7 +393,9 @@ async function updateMqttConfig() {
     let data = JSON.stringify(mainObj);
     await sendSerialLine('config_upload mqtt');
     await sendCharLine(data);
-    await console.log('DONE UPDATING CONFIG');
+    // await console.log('DONE UPDATING CONFIG');
+    setTimeout(getMqttCfg(), 7000);
+
 }
 
 //Data Call Config
@@ -418,7 +428,9 @@ function createDataCallForm(data) {
     let fieldset = document.createElement('fieldset');
     let legend = document.createElement('legend');
     let button = addButton("update", "datacall");
-    button.disabled = true;
+    button.style.backgroundColor = "green";
+    button.style.color = "white";
+
     legend.innerHTML = "Cellular";
     fieldset.appendChild(legend);
     form.id = "form_datacall";
@@ -431,12 +443,13 @@ function createDataCallForm(data) {
 }
 
 async function updateDataCallConfig() {
-    showsnackbar("wait", 1000);
+    showsnackbar("wait", 600);
     let form = document.getElementById('form_datacall');
     let data = createJSONfromForm(form, 'data_call');
     await sendSerialLine('config_upload datacall');
     await sendCharLine(data);
     await console.log('DONE UPDATING CONFIG');
+    setTimeout(getDataCallCfg(), 7000);
 }
 
 //Meter Configuration

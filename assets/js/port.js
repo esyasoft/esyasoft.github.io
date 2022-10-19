@@ -19,10 +19,13 @@ async function connectSerial(cmd) {
         textEncoder = new TextEncoderStream();
         writableStreamClosed = textEncoder.readable.pipeTo(port.writable);
         writer = textEncoder.writable.getWriter();
-        sendSerialLine(cmd);
+        if (!cmd) gwCellularStatus();
+        else await sendSerialLine(cmd);
         await listenToPort();
     } catch (e) {
-        alert("Serial Connection Failed" + e);
+        alert("Device is disconnected, please connect the device");
+        window.location.reload();
+        // connectSerial();
     }
 }
 
@@ -99,10 +102,9 @@ let keepReadingConfig = 0;
 
 async function appendToTerminal(newStuff) {
     var logging = document.getElementById('logging').value;
-    // console.log('[ ' + newStuff + ' ]\n');
-    if (newStuff.includes('updated successfully.')) showsnackbar('updated', 3000);
-    if (newStuff.includes('Try Again.')) showsnackbar('notUpdated', 3000);
-    if (newStuff.includes('restored to default successfully')) showsnackbar('reset_done', 3000);
+    if (newStuff.includes('updated successfully.')) showsnackbar('updated', 5000);
+    if (newStuff.includes('Try Again.')) showsnackbar('notUpdated', 5000);
+    if (newStuff.includes('restored to default successfully')) showsnackbar('reset_done', 5000);
 
     readData += newStuff;
     if (keepReadingConfig === 1) {
