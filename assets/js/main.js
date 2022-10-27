@@ -269,6 +269,11 @@ function addButton(operation, id) {
         button.id = "reset_" + id;
         return button;
     }
+    if (operation === "refresh") {
+        button.innerHTML = "Refresh";
+        button.id = "refresh_" + id;
+        return button;
+    }
 }
 
 function addSubmitButton(key) {
@@ -281,6 +286,7 @@ function addSubmitButton(key) {
 
 //Schedular Config
 function getSchedularConfig() {
+    clearInterval(ref_id);
     schedularConfig = '';
     let command = "config_show schedular";
     disableLogging();
@@ -335,6 +341,7 @@ async function updateSchedularConfig() {
 
 //MQTT Config
 function getMqttCfg() {
+    clearInterval(ref_id);
     mqttConfig = '';
     let command = "config_show mqtt";
     disableLogging();
@@ -400,6 +407,7 @@ async function updateMqttConfig() {
 
 //Data Call Config
 function getDataCallCfg() {
+    clearInterval(ref_id);
     datacallConfig = '';
     let command = "config_show datacall"
     disableLogging();
@@ -454,29 +462,54 @@ async function updateDataCallConfig() {
 
 //Meter Configuration
 function getMeterCfg() {
+    clearInterval(ref_id);
     meterConfig = '';
-    let command = "config_show meter";
+    let command = "meter_status";
     disableLogging();
     showDivByID('config_show');
     sendCliCommand(command);
 }
 
 function createMeterTable(data) {
+    clearContent();
+    let config_show = document.getElementById('config_show');
+    config_show.appendChild(addButton('refresh', 'meter'))
+    let meters = JSON.parse(data);
+    let dlms, mbus, st;
+    dlms = meters['connection_status']['dlms'];
+    mbus = meters['connection_status']['mbus'];
+    st = meters['connection_status']['st'];
+
+    dlms.forEach(function (value, index) {
+        createAccordion(value, meters['dlms_meter'][index]);
+    });
+
+    mbus.forEach(function (value, index) {
+        createAccordion(value, meters['mbus_meter'][index]);
+    });
+
+    st.forEach(function (value, index) {
+        createAccordion(value, meters['st_meter'][index]);
+    });
+    acc();
+}
+
+function createAccordion(value, data) {
+    let config_show = document.getElementById('config_show');
     let table = document.createElement('table');
     table.className = "_width100";
+    let button = document.createElement('button');
+    button.className = "accordion";
+    let div = document.createElement('div');
+    div.className = "-panel";
     let tbody = document.createElement('tbody');
-    let linebreak = document.createElement("br");
-    data_ = JSON.parse(data);
-    data = data_['dlms_meter'];
-    tbody = getTable(data, tbody);
-    data = data_['st_meter'];
-    tbody = getTable(data, tbody);
-    data = data_['mbus_meter'];
-    tbody = getTable(data, tbody);
-    table.appendChild(tbody);
-    clearContent();
-    // addEditButton("meter");
-    document.getElementById('config_show').appendChild(table);
+    table.appendChild(getTable([data], tbody));
+    div.appendChild(table);
+    button.innerHTML = !!+value['isConnected'] ? value['serial_number'] + " - Connected" : value['serial_number'] + " - Not Connected";
+    button.style.backgroundColor = !!+value['isConnected'] ? 'green' : 'red';
+    button.style.color = 'white';
+    config_show.appendChild(button);
+    config_show.appendChild(div);
 }
 
 function createMeterForm(data) {
@@ -522,17 +555,25 @@ function parseJSON(object) {
     return obj;
 }
 
+function cellular_status() {
+    gwCellularStatus();
+    ref_id = setInterval(gwCellularStatus, 3000);
+}
+
 function gwCellularStatus() {
+    disableLogging();
     cellular_info = "";
     let command = "cellular_status"
-    disableLogging();
-    showDivByID('config_show');
     sendCliCommand(command);
+    showDivByID('config_show');
+    console.log("refreshing");
 }
+
 
 function createCellularInfoTable(data) {
     let table = document.createElement('table');
     table.className = "_width100";
+    table.id = "cellular_table";
     let tbody = document.createElement('tbody');
     data_ = JSON.parse(data);
     data_ = parseJSON(data_);
@@ -569,6 +610,22 @@ function showDivByID(div) {
 //Hide the "Div"
 function hideDivByID(div) {
     document.getElementById(div).style.display = "none";
+}
+
+function acc() {
+    var accr = document.getElementsByClassName("accordion");
+    var j;
+    for (j = 0; j < accr.length; j++) {
+        accr[j].onclick = function () {
+            this.classList.toggle("active");
+            var panel = this.nextElementSibling;
+            if (panel.style.maxHeight) {
+                panel.style.maxHeight = null;
+            } else {
+                panel.style.maxHeight = panel.scrollHeight + "px";
+            }
+        }
+    }
 }
 
 

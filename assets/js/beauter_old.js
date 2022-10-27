@@ -1,16 +1,15 @@
-
 /*!
  * Beauter v0.3.0 (http://beauter.outboxcraft.com)
  * Copyright 2016-2018 Outboxcraft
  * Licensed under MIT (https://github.com/outboxcraft/beauter/blob/master/LICENSE)
  */
 
-function showsnackbar(y) {
+function showsnackbar(y, time) {
     var x = document.getElementById(y);
     x.className = x.className.replace("snackbar", "snackbar show");
     setTimeout(function () {
         x.className = x.className.replace("show", "");
-    }, 3000);
+    }, time);
 }
 
 

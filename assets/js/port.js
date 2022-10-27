@@ -160,7 +160,7 @@ async function appendToTerminal(newStuff) {
     if (newStuff.includes('config_show datacall')) {
         keepReadingConfig = 3;
     }
-    if (newStuff.includes('config_show meter')) {
+    if (newStuff.includes('meter_status')) {
         keepReadingConfig = 4;
     }
     if (newStuff.includes('cellular_status')) {

@@ -90,7 +90,7 @@ button.accordion {
     padding: 0;
 }
 
-div.-panel {
+div.-panel_left {
     padding: 0 !important;
     max-height: 100%;
     overflow: visible !important;

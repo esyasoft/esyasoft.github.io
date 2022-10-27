@@ -10,7 +10,6 @@
             integrity="sha256-w8CvhFs7iHNVUtnSP0YKEg00p9Ih13rlL9zGqvLdePA=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="assets/css/main.css">
     <link rel="stylesheet" href="assets/css/beauter.css">
-    <script src="assets/js/beauter.js"></script>
     <script src="assets/js/port.js"></script>
     <script src="assets/js/main.js"></script>
     <script src="assets/js/init.js"></script>
@@ -36,18 +35,19 @@
     </div>
     <div class="left">
         <button class="accordion active" disabled>System</button>
-        <div class="-panel" style="max-height: 156px">
+        <div class="-panel_left" style="max-height: 156px">
+            <!--        <div class="-panel">-->
             <ul class="listnav">
                 <li>
-                    <button onclick="gwCellularStatus()">System Information</button>
+                    <button id="cellular_inf_btn" onclick="cellular_status()">System Information</button>
                 </li>
                 <li>
                     <button onclick="enableLogging()">System Log</button>
                 </li>
             </ul>
         </div>
-        <button class="accordion active">Configuration</button>
-        <div class="-panel" style="max-height: 156px">
+        <button class="accordion active" disabled>Configuration</button>
+        <div class="-panel_left" style="max-height: 156px">
             <ul class="listnav">
                 <li>
                     <button onclick="getDataCallCfg()">Cellular</button>
@@ -87,8 +87,8 @@
         <!-- /.config_show -->
     </div>
 </div>
-<!--<script src="https://rawgit.com/outboxcraft/beauter/master/beauter.min.js">-->
-</script>
+<script src="assets/js/beauter.js"></script>
+<!--<script src="https://rawgit.com/outboxcraft/beauter/master/beauter.min.js"></script>-->
 </body>
 </html>
 
@@ -115,8 +115,12 @@
         "reset_datacall": "reset_config('datacall')",
     }
 
+    const refresh_map = {
+        "refresh_meter": "getMeterCfg()"
+    }
+
     document.addEventListener('click', async function (e) {
-        eval((edit_map[e.target.id] || submit_map[e.target.id] || reset_map[e.target.id]));
+        eval((edit_map[e.target.id] || submit_map[e.target.id] || reset_map[e.target.id] || refresh_map[e.target.id]));
         if (e.target.id === "connect") {
             if (port) await disconnectSerial();
             else await connectSerial();
@@ -142,6 +146,24 @@
         var dateString = new Date().toLocaleString("en-US", {timeZone: "Asia/Dubai"});
         var formattedString = dateString.replace(", ", " - ");
         timeDisplay.innerHTML = formattedString;
+    }
+
+    let cellular_info_btn = document.getElementById('cellular_inf_btn');
+
+    // cellular_info_btn.onclick(refreshCellularInfo());
+
+    function refresh_gwCellularStatus() {
+        let a = document.getElementById('cellular_table');
+        if (!a) {
+            return;
+        }
+        console.log('Refreshing');
+        gwCellularStatus();
+    }
+
+    function refreshCellularInfo() {
+        setTimeout(refresh_gwCellularStatus(), 10000);
+
     }
 
     // setInterval(refreshTime, 1000);
