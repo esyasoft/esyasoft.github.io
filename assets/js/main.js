@@ -255,6 +255,7 @@ function addButton(operation, id) {
     let button = document.createElement("button");
     button.className = "button";
     if (operation === "edit") {
+        button.className += " _dark  _floatRight";
         button.innerHTML = "Edit";
         button.id = "edit_" + id;
         return button;
@@ -265,6 +266,7 @@ function addButton(operation, id) {
         return button;
     }
     if (operation === "reset") {
+        button.className += " _danger  _floatRight";
         button.innerHTML = "Reset";
         button.id = "reset_" + id;
         return button;
@@ -299,12 +301,15 @@ function createSchedularTable(data) {
     let table = document.createElement('table');
     table.className = "_width100";
     let tbody = document.createElement('tbody');
+    let h3 = document.createElement("h3");
+    h3.innerHTML = "Schedular";
     data = JSON.parse(data)['scheduler_cfg'];
     tbody = getTable(data, tbody);
     table.appendChild(tbody);
     let config_name = document.getElementById('config_name');
     config_name.appendChild(addButton("edit", "schedular"));
     config_name.appendChild(addButton("reset", "schedular"));
+    config_name.appendChild(h3);
 
     document.getElementById('config_show').appendChild(table);
 }
@@ -353,7 +358,9 @@ function createMqttTable(data) {
     let table = document.createElement('table');
     table.className = "_width100";
     let tbody = document.createElement('tbody');
-    data_ = JSON.parse(data);
+    let h3 = document.createElement("h3");
+    h3.innerHTML = "MQTT";
+    let data_ = JSON.parse(data);
     data = data_['mqtt'];
     tbody = getTable(data, tbody);
     data = data_['mqtt_topics'];
@@ -363,6 +370,7 @@ function createMqttTable(data) {
     let config_name = document.getElementById('config_name');
     config_name.appendChild(addButton("edit", "mqtt"));
     config_name.appendChild(addButton("reset", "mqtt"));
+    config_name.appendChild(h3);
 
     document.getElementById('config_show').appendChild(table);
 }
@@ -416,17 +424,19 @@ function getDataCallCfg() {
 }
 
 function createDataCallTable(data) {
+    clearContent();
     let table = document.createElement('table');
     table.className = "_width100";
+    let config_name = document.getElementById('config_name');
     let tbody = document.createElement('tbody');
-    data = JSON.parse(data);
-    data = data['data_call']
+    let h3 = document.createElement("h3");
+    h3.innerHTML = "Cellular";
+    data = JSON.parse(data)['data_call'];
     tbody = getTable(data, tbody);
     table.appendChild(tbody);
-    clearContent();
-    let config_name = document.getElementById('config_name');
     config_name.appendChild(addButton("edit", "datacall"));
     config_name.appendChild(addButton("reset", "datacall"));
+    config_name.appendChild(h3);
     document.getElementById('config_show').appendChild(table);
 }
 
@@ -557,7 +567,7 @@ function parseJSON(object) {
 
 function cellular_status() {
     gwCellularStatus();
-    ref_id = setInterval(gwCellularStatus, 3000);
+    if (ref_id === -1) ref_id = setInterval(gwCellularStatus, 3000);
 }
 
 function gwCellularStatus() {
@@ -570,23 +580,25 @@ function gwCellularStatus() {
 }
 
 
-function createCellularInfoTable(data) {
+function createSystemInfoTable(data) {
     let table = document.createElement('table');
     table.className = "_width100";
-    table.id = "cellular_table";
+    let h3 = document.createElement("h3");
+    h3.innerHTML = "System Information";
     let tbody = document.createElement('tbody');
-    data_ = JSON.parse(data);
+    let data_ = JSON.parse(data);
     data_ = parseJSON(data_);
-    let json_array = []
-    json_array.push(data_);
-    tbody = getTable(json_array, tbody);
+
+    tbody = getTable([data_], tbody);
     table.appendChild(tbody);
     clearContent();
+    document.getElementById('config_name').appendChild(h3);
     document.getElementById('config_show').appendChild(table);
 }
 
 //Enable Logging
 function enableLogging() {
+    clearInterval(ref_id);
     let command = "enable_logging";
     clearContent();
     document.getElementById('logging').value = 1;

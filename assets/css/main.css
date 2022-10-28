@@ -96,13 +96,27 @@ div.-panel_left {
     overflow: visible !important;
 }
 
+div.-panel table {
+    margin-top: 0;
+}
+
 #config_show {
-    padding-top: 60px;
+    /*padding-top: 60px;*/
+}
+
+#config_name {
+    margin-bottom: 10px !important;
+    height: 0;
+}
+
+#config_name button {
+    margin: 2px;
 }
 
 table {
     border: 1px solid black !important;
     border-collapse: collapse;
+    margin-top: 80px;
 }
 
 ul.topnav {

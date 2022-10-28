@@ -3,7 +3,7 @@ const read_only = ["id", "clean_session", "retain", "client_id", "keep_alive", "
     "reconnect_delay", "reconnect_delay_max", "reconnect_exponential_backoff"];
 
 var update_btn, input_fields, run;
-var ref_id;
+var ref_id = -1;
 //Dropdown Keys
 const net_pref = ["GSM", "CATM", "GSM+CATM", "NBIOT", "GSM+NBIOT", "CATM+NBIOT", "GSM+CATM+NBIOT"];
 const custom_apn = ["NO", "YES"];

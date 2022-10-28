@@ -5,7 +5,8 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Esyasoft GW GUI</title>
+    <link rel="icon" href="assets/title_logo.png" type="image/x-icon">
     <script src="https://code.jquery.com/jquery-3.6.1.slim.min.js"
             integrity="sha256-w8CvhFs7iHNVUtnSP0YKEg00p9Ih13rlL9zGqvLdePA=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="assets/css/main.css">
@@ -148,24 +149,7 @@
         timeDisplay.innerHTML = formattedString;
     }
 
-    let cellular_info_btn = document.getElementById('cellular_inf_btn');
+    f
 
-    // cellular_info_btn.onclick(refreshCellularInfo());
-
-    function refresh_gwCellularStatus() {
-        let a = document.getElementById('cellular_table');
-        if (!a) {
-            return;
-        }
-        console.log('Refreshing');
-        gwCellularStatus();
-    }
-
-    function refreshCellularInfo() {
-        setTimeout(refresh_gwCellularStatus(), 10000);
-
-    }
-
-    // setInterval(refreshTime, 1000);
 
 </script>

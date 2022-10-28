@@ -19,7 +19,7 @@ async function connectSerial(cmd) {
         textEncoder = new TextEncoderStream();
         writableStreamClosed = textEncoder.readable.pipeTo(port.writable);
         writer = textEncoder.writable.getWriter();
-        if (!cmd) gwCellularStatus();
+        if (!cmd) cellular_status();
         else await sendSerialLine(cmd);
         await listenToPort();
     } catch (e) {
@@ -146,24 +146,24 @@ async function appendToTerminal(newStuff) {
         cellular_info += removeWhitespaces(newStuff);
         if (newStuff.includes('\r\n')) {
             keepReadingConfig = 0;
-            createCellularInfoTable(cellular_info);
+            createSystemInfoTable(cellular_info);
             return;
         }
     }
 
-    if (newStuff.includes('config_show mqtt')) {
+    if (!keepReadingConfig && newStuff.includes('config_show mqtt')) {
         keepReadingConfig = 1;
     }
-    if (newStuff.includes('config_show schedular')) {
+    if (!keepReadingConfig && newStuff.includes('config_show schedular')) {
         keepReadingConfig = 2;
     }
-    if (newStuff.includes('config_show datacall')) {
+    if (!keepReadingConfig && newStuff.includes('config_show datacall')) {
         keepReadingConfig = 3;
     }
-    if (newStuff.includes('meter_status')) {
+    if (!keepReadingConfig && newStuff.includes('meter_status')) {
         keepReadingConfig = 4;
     }
-    if (newStuff.includes('cellular_status')) {
+    if (!keepReadingConfig && newStuff.includes('cellular_status')) {
         keepReadingConfig = 5;
     }
 

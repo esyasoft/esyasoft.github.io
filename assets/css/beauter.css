@@ -88,7 +88,6 @@ blockquote footer {
 }
 
 
-
 /*<<<---------- Forms ---------->>>*/
 
 .button,
@@ -315,8 +314,6 @@ select:focus {
 }
 
 
-
-
 /*<<<---------- Lists ---------->>>*/
 
 ol {
@@ -367,11 +364,6 @@ dl dt {
 }
 
 
-
-
-
-
-
 /*<<<---------- Tables ---------->>>*/
 
 table {
@@ -409,6 +401,9 @@ tr:nth-child(even) {
     background-color: #f2f2f2;
 }
 
+tr:last-child td {
+    border-bottom: 1px solid #000000;
+}
 
 
 /*<<<---------- Typography ---------->>>*/
@@ -608,7 +603,6 @@ hr {
 }
 
 
-
 /*<<<---------- Accordion ---------->>>*/
 
 
@@ -666,7 +660,6 @@ div.-panel {
 }
 
 
-
 /*<<<---------- Alert ---------->>>*/
 
 .alert {
@@ -690,7 +683,6 @@ div.-panel {
     border-radius: 100%;
     background-color: #ddd;
 }
-
 
 
 /*<<<---------- Breadcrumb ---------->>>*/
@@ -804,8 +796,6 @@ ul.breadcrumb li a:hover {
 
     text-align: center;
 }
-
-
 
 
 /*<<<---------- Grid and Responsive Classes ---------->>>*/
@@ -1201,7 +1191,6 @@ ul.breadcrumb li a:hover {
 }
 
 
-
 /*<<<---------- Modal ---------->>>*/
 
 .modalbox-modal {
@@ -1307,7 +1296,6 @@ ul.breadcrumb li a:hover {
 
     color: #000;
 }
-
 
 
 /*<<<---------- Navigation ---------->>>*/
@@ -1536,8 +1524,6 @@ ul.listnav {
 }
 
 
-
-
 /*<<<---------- Pagination ---------->>>*/
 
 /*.pagination  a
@@ -1588,8 +1574,6 @@ ul.listnav {
 }
 
 
-
-
 /*<<<---------- Parallax ---------->>>*/
 
 .bg-parallax {
@@ -1611,7 +1595,6 @@ ul.listnav {
 
     color: #fff;
 }
-
 
 
 /*<<<---------- Progress Bar ---------->>>*/
@@ -1643,9 +1626,6 @@ ul.listnav {
 
     color: #fff;
 }
-
-
-
 
 
 /*<<<---------- Snack Bar ---------->>>*/
@@ -1725,10 +1705,6 @@ ul.listnav {
 }
 
 
-
-
-
-
 /*<<<---------- Tabs ---------->>>*/
 
 /* Style the tab */
@@ -1805,9 +1781,6 @@ ul.listnav {
         opacity: 1;
     }
 }
-
-
-
 
 
 /*<<<---------- Tooltips ---------->>>*/
@@ -1920,8 +1893,6 @@ ul.listnav {
 }
 
 
-
-
 /*<<<---------- Media Elements ---------->>>*/
 
 svg:not(:root) {
@@ -1955,7 +1926,6 @@ img {
 
     border: 2px solid #d3d3d3;
 }
-
 
 
 /*<<<---------- Utilities ---------->>>*/
@@ -2306,7 +2276,6 @@ img {
 }
 
 
-
 /*<<<---------- Colors ---------->>>*/
 
 ._cream,
@@ -2541,8 +2510,6 @@ img {
 ._bc-warning {
     border-color: #ff9800 !important;
 }
-
-
 
 
 /*<<<---------- notes ---------->>>*/
