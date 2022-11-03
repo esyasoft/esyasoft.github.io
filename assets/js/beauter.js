@@ -13,6 +13,16 @@ function showsnackbar(y) {
     }, 3000);
 }
 
+function showcustomsnackbar(str) {
+    var x = document.getElementById("custom_snackbar_red");
+    x.innerHTML = str;
+    x.className = x.className.replace("snackbar", "snackbar show");
+    setTimeout(function () {
+        x.className = x.className.replace("show", "");
+        x.innerHTML = "";
+    }, 3000);
+}
+
 
 function topnav(y) {
     var x = document.getElementById(y);

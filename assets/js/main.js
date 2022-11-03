@@ -1,4 +1,4 @@
-let edit_btn, connectButton;
+let connectButton;
 let schedularConfig = "", mqttConfig = "", datacallConfig = "", meterConfig = "";
 let cellular_info = "";
 const kvmap = {
@@ -130,7 +130,10 @@ const kvmap = {
     "firmwareVersion": "Firmware Version",
     "time": "Time",
     "esn": "USN",
-    "product_version": "Product"
+    "product_version": "Product Version",
+    "power_quality_profile_time": "Power Quality Profile Time",
+    "instrumentation_profile_time": "Instrumentation Profile Time",
+    "alarm_time": "Alarm Time"
 }
 
 function createJSONfromForm(form, key) {
@@ -174,7 +177,7 @@ function getTable(data, tbody) {
             let tr = document.createElement('tr');
             let td1 = document.createElement('td');
             let td2 = document.createElement('td');
-            td1.innerText = kvmap[key];
+            td1.innerText = kvmap?.[key] || key;
             tr.appendChild(td1);
             if (DROPDOWN_KEYS.includes(key)) {
                 td2.innerHTML = eval(key)[val];
@@ -360,19 +363,23 @@ function createMqttTable(data) {
     let tbody = document.createElement('tbody');
     let h3 = document.createElement("h3");
     h3.innerHTML = "MQTT";
-    let data_ = JSON.parse(data);
-    data = data_['mqtt'];
-    tbody = getTable(data, tbody);
-    data = data_['mqtt_topics'];
-    tbody = getTable(data, tbody);
-    table.appendChild(tbody);
-    clearContent();
-    let config_name = document.getElementById('config_name');
-    config_name.appendChild(addButton("edit", "mqtt"));
-    config_name.appendChild(addButton("reset", "mqtt"));
-    config_name.appendChild(h3);
+    try {
+        let data_ = JSON.parse(data);
+        data = data_['mqtt'];
+        tbody = getTable(data, tbody);
+        data = data_['mqtt_topics'];
+        tbody = getTable(data, tbody);
+        table.appendChild(tbody);
+        clearContent();
+        let config_name = document.getElementById('config_name');
+        config_name.appendChild(addButton("edit", "mqtt"));
+        config_name.appendChild(addButton("reset", "mqtt"));
+        config_name.appendChild(h3);
 
-    document.getElementById('config_show').appendChild(table);
+        document.getElementById('config_show').appendChild(table);
+    } catch (e) {
+        showcustomsnackbar("Something went wrong, Please try again.");
+    }
 }
 
 function createMqttForm(data) {
@@ -431,13 +438,17 @@ function createDataCallTable(data) {
     let tbody = document.createElement('tbody');
     let h3 = document.createElement("h3");
     h3.innerHTML = "Cellular";
-    data = JSON.parse(data)['data_call'];
-    tbody = getTable(data, tbody);
-    table.appendChild(tbody);
-    config_name.appendChild(addButton("edit", "datacall"));
-    config_name.appendChild(addButton("reset", "datacall"));
-    config_name.appendChild(h3);
-    document.getElementById('config_show').appendChild(table);
+    try {
+        data = JSON.parse(data)['data_call'];
+        tbody = getTable(data, tbody);
+        table.appendChild(tbody);
+        config_name.appendChild(addButton("edit", "datacall"));
+        config_name.appendChild(addButton("reset", "datacall"));
+        config_name.appendChild(h3);
+        document.getElementById('config_show').appendChild(table);
+    } catch (e) {
+        showcustomsnackbar("Something went wrong, Please try again.");
+    }
 }
 
 function createDataCallForm(data) {
@@ -483,25 +494,29 @@ function getMeterCfg() {
 function createMeterTable(data) {
     clearContent();
     let config_show = document.getElementById('config_show');
-    config_show.appendChild(addButton('refresh', 'meter'))
-    let meters = JSON.parse(data);
-    let dlms, mbus, st;
-    dlms = meters['connection_status']['dlms'];
-    mbus = meters['connection_status']['mbus'];
-    st = meters['connection_status']['st'];
+    config_show.appendChild(addButton('refresh', 'meter'));
+    try {
+        let meters = JSON.parse(data);
+        let dlms, mbus, st;
+        dlms = meters['connection_status']['dlms'];
+        mbus = meters['connection_status']['mbus'];
+        st = meters['connection_status']['st'];
 
-    dlms.forEach(function (value, index) {
-        createAccordion(value, meters['dlms_meter'][index]);
-    });
+        dlms.forEach(function (value, index) {
+            createAccordion(value, meters['dlms_meter'][index]);
+        });
 
-    mbus.forEach(function (value, index) {
-        createAccordion(value, meters['mbus_meter'][index]);
-    });
+        mbus.forEach(function (value, index) {
+            createAccordion(value, meters['mbus_meter'][index]);
+        });
 
-    st.forEach(function (value, index) {
-        createAccordion(value, meters['st_meter'][index]);
-    });
-    acc();
+        st.forEach(function (value, index) {
+            createAccordion(value, meters['st_meter'][index]);
+        });
+        acc();
+    } catch (e) {
+        showcustomsnackbar("Something went wrong, Please try again.");
+    }
 }
 
 function createAccordion(value, data) {
