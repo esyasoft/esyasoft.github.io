@@ -501,7 +501,9 @@ function createMeterTable(data) {
         dlms = meters['connection_status']['dlms'];
         mbus = meters['connection_status']['mbus'];
         st = meters['connection_status']['st'];
-
+        if (!dlms.length && !mbus.length && !st.length) {
+            showcustomsnackbar("No Meters Available");
+        }
         dlms.forEach(function (value, index) {
             createAccordion(value, meters['dlms_meter'][index]);
         });
@@ -655,4 +657,6 @@ function acc() {
     }
 }
 
-
+function is_scrolling() {
+    return window.lastScrollTime && new Date().getTime() < window.lastScrollTime + 5000;
+}

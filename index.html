@@ -150,4 +150,9 @@
         timeDisplay.innerHTML = formattedString;
     }
 
+    serialResultsDiv.addEventListener("wheel", function () {
+        window.lastScrollTime = new Date().getTime();
+        console.log("Scroll Time", window.lastScrollTime);
+    });
+
 </script>
