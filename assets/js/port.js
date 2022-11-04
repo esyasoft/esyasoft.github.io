@@ -107,7 +107,6 @@ async function appendToTerminal(newStuff) {
     if (newStuff.includes('restored to default successfully')) showsnackbar('reset_done', 5000);
 
     readData += newStuff;
-    serialResultsDiv.innerHTML += newStuff;
     if (keepReadingConfig === 1) {
         if (newStuff.includes('\r\n')) {
             mqttConfig += removeWhitespaces(newStuff);
@@ -167,10 +166,10 @@ async function appendToTerminal(newStuff) {
     if (!keepReadingConfig && newStuff.includes('cellular_status')) {
         keepReadingConfig = 5;
     }
-    let bottom = serialResultsDiv.scrollHeight;
     if (logging == "1") {
         serialResultsDiv.style.display = 'block';
-        is_scrolling() ? null : serialResultsDiv.scrollTop = bottom;
+        serialResultsDiv.innerHTML += newStuff;
+        serialResultsDiv.scrollTop = serialResultsDiv.scrollHeight;
     }
 }
 
