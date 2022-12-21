@@ -146,7 +146,6 @@ function createJSONfromForm(form, key) {
     }
     arr[0] = obj;
     mainObj[key] = arr;
-    // console.log(JSON.stringify(mainObj));
     return JSON.stringify(mainObj);
 }
 
@@ -167,9 +166,10 @@ function removeWhitespaces(data) {
 }
 
 function getTable(data, tbody) {
+    let DONT_SHOW = ["id", "time", "ssl_enabled"] //Not shown in the TABLE
     for (let i = 0; i < data.length; i++) {
         for (let key in data[i]) {
-            if (key === "id" || key === "time") {
+            if (DONT_SHOW.indexOf(key)!==-1) {
                 continue;
             }
             let val = data[i][key];
@@ -179,9 +179,23 @@ function getTable(data, tbody) {
             let td2 = document.createElement('td');
             td1.innerText = kvmap?.[key] || key;
             tr.appendChild(td1);
-            if (DROPDOWN_KEYS.includes(key)) {
-                td2.innerHTML = eval(key)[val];
-            } else td2.innerHTML = val;
+            switch (key) {
+                case DROPDOWN_KEYS.includes(key):
+                    td2.innerHTML = eval(key)[val];
+                    break;
+
+                case "RAM":
+                    td2.innerHTML = (val/1024).toFixed(3) +" MB / 0.4 MB";
+                    break;
+
+                case "FlashStorage":
+                    td2.innerHTML = (val/1024).toFixed(3)+" MB / 1.7 MB";
+                    break;
+
+                default:
+                    td2.innerHTML = val;
+                    break;
+            }
             tr.appendChild(td2);
             tbody.appendChild(tr);
         }
@@ -213,9 +227,9 @@ function createSelectList(key, value, fieldset) {
             fieldset.appendChild(createOptions(key, value, net_scan_seq));
             return fieldset;
 
-        case "ssl_enabled":
-            fieldset.appendChild(createOptions(key, value, ssl_enabled));
-            return fieldset;
+        // case "ssl_enabled":
+        //     fieldset.appendChild(createOptions(key, value, ssl_enabled));
+        //     return fieldset;
     }
 }
 
@@ -235,7 +249,7 @@ function createForm(data, fieldset) {
             fieldset.appendChild(label);
 
             if (typeof (val) == 'number') {
-                if (["custom_apn", "net_pref", "net_scan_seq", "ssl_enabled"].indexOf(key) !== -1) {
+                if (["custom_apn", "net_pref", "net_scan_seq"].indexOf(key) !== -1) {
                     fieldset = createSelectList(key, val, fieldset);
                 } else {
                     input.type = 'number';
@@ -344,7 +358,7 @@ async function updateSchedularConfig() {
     await sendSerialLine('config_upload schedular');
     await sendCharLine(data);
     await console.log('DONE UPDATING CONFIG');
-    setTimeout(getSchedularConfig(), 7000);
+    await getSchedularConfig();
 }
 
 //MQTT Config
@@ -401,6 +415,7 @@ function createMqttForm(data) {
 }
 
 async function updateMqttConfig() {
+    let s = 0;
     showsnackbar("wait", 600);
     let form = document.getElementById('form_mqtt');
     let mainObj = {};
@@ -415,9 +430,8 @@ async function updateMqttConfig() {
     let data = JSON.stringify(mainObj);
     await sendSerialLine('config_upload mqtt');
     await sendCharLine(data);
-    // await console.log('DONE UPDATING CONFIG');
-    setTimeout(getMqttCfg(), 7000);
-
+    await delay(0.1);
+    getMqttCfg();
 }
 
 //Data Call Config

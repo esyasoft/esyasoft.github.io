@@ -5,11 +5,11 @@
  */
 
 function showsnackbar(y, time) {
-    var x = document.getElementById(y);
-    x.className = x.className.replace("snackbar", "snackbar show");
+    let x = document.getElementById(y);
     setTimeout(function () {
         x.className = x.className.replace("show", "");
     }, time);
+    x.className = x.className.replace("snackbar", "snackbar show");
 }
 
 
