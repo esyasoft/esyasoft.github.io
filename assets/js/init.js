@@ -1,4 +1,6 @@
 const DROPDOWN_KEYS = ["net_pref", "custom_apn", "net_scan_seq", "ssl_enabled"];
+
+//Keys that are not shown in the EDIT form
 const read_only = ["id", "clean_session", "retain", "client_id", "keep_alive", "will_topic", "will_qos", "will_retain", "will_payload",
     "reconnect_delay", "reconnect_delay_max", "reconnect_exponential_backoff","ssl_enabled"];
 

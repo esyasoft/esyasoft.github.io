@@ -33,20 +33,19 @@ async function sendSerialLine(dataToSend) {
     // dataToSend = document.getElementById("lineToSend").value;
     lineHistory.unshift(dataToSend);
     historyIndex = -1; // No history entry selected
-    dataToSend = dataToSend + "\r";
-    dataToSend = dataToSend + "\n";
+    dataToSend = dataToSend + "\r\n";
     await writer.write(dataToSend);
     return;
 }
 
 async function sendCharLine(str) {
-    for (var i = 0, charsLength = str.length; i < charsLength; i += 200) {
+    for (let i = 0, charsLength = str.length; i < charsLength; i += 200) {
         await writer.write(str.substring(i, i + 200));
         console.log('SENT: ==', str.substring(i, i + 200));
         await delay(0.1);
     }
     await writer.write('`');
-    return;
+    return 1;
 }
 
 async function listenToPort() {
@@ -63,7 +62,7 @@ async function listenToPort() {
             break;
         }
         // value is a string.
-        appendToTerminal(value);
+        await appendToTerminal(value);
     }
 }
 
@@ -101,7 +100,7 @@ let readData;
 let keepReadingConfig = 0;
 
 async function appendToTerminal(newStuff) {
-    var logging = document.getElementById('logging').value;
+    let logging = document.getElementById('logging').value;
     if (newStuff.includes('updated successfully.')) showsnackbar('updated', 5000);
     if (newStuff.includes('Try Again.')) showsnackbar('notUpdated', 5000);
     if (newStuff.includes('restored to default successfully')) showsnackbar('reset_done', 5000);
@@ -150,7 +149,10 @@ async function appendToTerminal(newStuff) {
             return;
         }
     }
-
+    if (newStuff.includes('enable_logging')) {
+        serialResultsDiv.innerHTML += "Logging Started";
+        return;
+    }
     if (!keepReadingConfig && newStuff.includes('config_show mqtt')) {
         keepReadingConfig = 1;
     }
