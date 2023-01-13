@@ -19,7 +19,7 @@ function showcustomsnackbar(str) {
     x.className = x.className.replace("snackbar", "snackbar show");
     setTimeout(function () {
         x.className = x.className.replace("show", "");
-        x.innerHTML = "";
+        // x.innerHTML = "";
     }, 3000);
 }
 

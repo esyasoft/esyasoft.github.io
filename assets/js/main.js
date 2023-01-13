@@ -169,7 +169,7 @@ function removeWhitespaces(data) {
 function getTable(data, tbody) {
     for (let i = 0; i < data.length; i++) {
         for (let key in data[i]) {
-            if (key === "id" || key === "time") {
+            if (key === "id" || key === "time" || key ==="ssl_enabled") {
                 continue;
             }
             let val = data[i][key];
@@ -177,11 +177,28 @@ function getTable(data, tbody) {
             let tr = document.createElement('tr');
             let td1 = document.createElement('td');
             let td2 = document.createElement('td');
-            td1.innerText = kvmap?.[key] || key;
+            td1.innerText = kvmap?.[key] || key; //Key
             tr.appendChild(td1);
-            if (DROPDOWN_KEYS.includes(key)) {
-                td2.innerHTML = eval(key)[val];
-            } else td2.innerHTML = val;
+            switch (key) {
+                case DROPDOWN_KEYS.includes(key):
+                    td2.innerHTML = eval(key)[val];                    
+                    break;
+
+                case "RAM":
+                    td2.innerHTML = val+" kb / 400 kb";
+                    break;
+
+                case "FlashStorage":
+                    td2.innerHTML = val+" kb / 1700 kb";
+                    break;
+            
+                default:
+                    td2.innerHTML = val;
+                    break;
+            }
+            // if (DROPDOWN_KEYS.includes(key)) {
+            //     td2.innerHTML = eval(key)[val];
+            // } else td2.innerHTML = val;
             tr.appendChild(td2);
             tbody.appendChild(tr);
         }
