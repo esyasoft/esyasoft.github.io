@@ -1,140 +1,6 @@
 let connectButton;
 let schedularConfig = "", mqttConfig = "", datacallConfig = "", meterConfig = "";
 let cellular_info = "";
-const kvmap = {
-    "energy_profile_time": "Energy Profile",
-    "load_profile1_time": "Load Profile1 Time",
-    "load_profile2_time": "Load Profile2 Time",
-    "billing_profile_time": "Billing Profile Time",
-    "md_profile_time": "Max Demand Profile Time",
-    "instantaneous_profile_time": "Instantaneous Profile Time",
-    "event_profile_time": "Event Profile Time",
-    "water_profile_time": "Water Profile Time",
-    "water_event_time": "Water Event Time",
-    "water_billing_time": "Water Billing Time",
-    "connection_retry_cnt": "Connection Retry Count",
-    "connection_retry_delay": "Connection Retry Delay",
-    "gateway_event_time": "Gateway Event Time",
-    "event_polling": "Event Polling",
-    "no_of_days": "No Of Days",
-    "delete_data": "Delete Data",
-    "heartbeat_time": "Heartbeat Time",
-    "check_fota": "Check Fota",
-    "ssl_enabled": "SSL Enabled?",
-    "host": "Host",
-    "port": "Port",
-    "qos": "QOS",
-    "username": "Username",
-    "password": "Password",
-    "clean_session": "Clean Session",
-    "retain": "Retain",
-    "client_id": "Client Id",
-    "keep_alive": "Keep Alive",
-    "will_topic": "Will Topic",
-    "will_qos": "Will QOS",
-    "will_retain": "Will Retain",
-    "will_payload": "Will Payload",
-    "reconnect_delay": "Reconnect Delay",
-    "reconnect_delay_max": "Max Reconnect Delay",
-    "reconnect_exponential_backoff": "Reconnect Exponential Backoff",
-    "topic_meter_energy_profile": "Energy Profile",
-    "topic_meter_load_profile1": "Load Profile 1",
-    "topic_meter_load_profile2": "Load Profile 2",
-    "topic_meter_billing_profile": "Billing Profile",
-    "topic_meter_maxdemand_profile": "MaxDemand Profile",
-    "topic_meter_instantaneous_profile": "Instantaeous Profile",
-    "topic_meter_event_profile": "Meter Event",
-    "topic_meter_water_profile": "Water Profile",
-    "topic_meter_water_event": "Water Event",
-    "topic_water_billingprofile": "Water Billing Profile",
-    "topic_meter_status": "Meter Status",
-    "topic_meter_reconnection": "Meter Reconnection",
-    "topic_meter_switch_status": "Meter Switch Status",
-    "topic_meter_clear_alarms": "Clear Alarms",
-    "topic_meter_nameplate": "Meter Nameplace",
-    "topic_meter_ping": "Meter Ping",
-    "topic_meter_clock": "Meter Clock Time",
-    "topic_meter_get_current_range_low": "Get Current Range Low",
-    "topic_meter_get_current_range_up": "Get Current Range Up",
-    "topic_meter_set_current_range_up": "Set Current Range Up",
-    "topic_meter_set_current_range_low": "Set Current Range Low",
-    "topic_meter_get_voltage_range_up": "Get Voltage Range Up",
-    "topic_meter_get_voltage_range_low": "Get Voltage Range Low",
-    "topic_meter_set_voltage_range_up": "Set Voltage Range Up",
-    "topic_meter_set_voltage_range_low": "Set Voltage Range Low",
-    "topic_meter_password": "Meter Password",
-    "topic_meter_firmware_status": "Meter Firmware Status",
-    "topic_meter_firmware": "Meter Firmware",
-    "topic_meter_active_tariff": "Active Tarrif",
-    "topic_meter_tou_tariff": "Tou Tariff",
-    "topic_meter_get_metering_mode": "Get Metering Mode",
-    "topic_meter_set_metering_mode": "Set Metering Mode",
-    "topic_meter_get_payment_mode": "Get Payment Mode",
-    "topic_meter_set_payment_mode": "Set Payment Mode",
-    "topic_meter_get_demand_int_period": "Get Demand Int Period",
-    "topic_meter_set_demand_int_period": "Set Demand Int Period",
-    "topic_meter_get_billing_date": "Get Billing Date",
-    "topic_meter_set_billing_date": "Set Billing Date",
-    "topic_meter_limit_threshold": "Limit Threshold",
-    "topic_meter_load_limit": "Load Limit",
-    "topic_meter_billing_reset": "Billing Reset",
-    "topic_meter_meter_instrumentation_profile": "Instrumentation Profile",
-    "topic_meter_power_quality_profile": "Power Quality Profile",
-    "topic_gateway_config": "Gateway Configuration",
-    "topic_gateway_firmware_update": "Gateway Firmware Update",
-    "topic_gateway_event": "Gateway Event",
-    "topic_gateway_get_interval": "Gateway Get Interval",
-    "topic_gateway_set_interval": "Gateway Set Interval",
-    "topic_gateway_password": "Gateway Password",
-    "topic_gateway_clocktime": "Gateway Clock Time",
-    "topic_gateway_nameplate": "Gateway Name Plate",
-    "topic_gateway_ping": "Gateway Ping",
-    "topic_gateway_synchronization": "Meter Sync",
-    "topic_gateway_heartbeat": "Heartbeat",
-    "trace": "Trace",
-    "security_type": "Security Type",
-    "wrapper_or_hdlc": "Wrapper/HDLC",
-    "serial_number": "Serial Number",
-    "authentication": "Authentication",
-    "physical_address": "Physical Address",
-    "logical_address": "Logical Address",
-    "commType": "Communication Type",
-    "manufacturer": "Manufacturer",
-    "initial_buadrate": "Initial Baudrate",
-    "framing": "Framing",
-    "protocol": "Protocol",
-    "meter_brand": "Meter Brand",
-    "meter_model": "Meter Model",
-    "client_address": "Client Address",
-    "apn": "APN",
-    "custom_apn": "Custom APN",
-    "apn_username": "APN Username",
-    "apn_passwd": "APN Password",
-    "ip_version": "IP Version",
-    "net_pref": "Net Pref",
-    "net_scan_seq": "Net Scan Sequence",
-    "fota_url_1": "FOTA URL 1",
-    "fota_url_2": "FOTA URL 2",
-    "serialnumber": "Serial Number",
-    "model": "Model",
-    "mac_address": "MAC Address",
-    "iccid": "ICCID",
-    "msisdn": "MSISDN",
-    "rsrp": "RSRP",
-    "rssi": "RSSI",
-    "rsrq": "RSRQ",
-    "sinr": "SINR",
-    "band": "Band",
-    "typeCommunication": "Type Of Communication",
-    "networkIP": "Network IP",
-    "firmwareVersion": "Firmware Version",
-    "time": "Time",
-    "esn": "USN",
-    "product_version": "Product Version",
-    "power_quality_profile_time": "Power Quality Profile Time",
-    "instrumentation_profile_time": "Instrumentation Profile Time",
-    "alarm_time": "Alarm Time"
-}
 
 function createJSONfromForm(form, key) {
     let mainObj = {};
@@ -185,20 +51,17 @@ function getTable(data, tbody) {
                     break;
 
                 case "RAM":
-                    td2.innerHTML = val+" kb / 400 kb";
+                    td2.innerHTML = val+" kb / 500 kb";
                     break;
 
                 case "FlashStorage":
-                    td2.innerHTML = val+" kb / 1700 kb";
+                    td2.innerHTML = val+" kb / 2400 kb";
                     break;
             
                 default:
                     td2.innerHTML = val;
                     break;
             }
-            // if (DROPDOWN_KEYS.includes(key)) {
-            //     td2.innerHTML = eval(key)[val];
-            // } else td2.innerHTML = val;
             tr.appendChild(td2);
             tbody.appendChild(tr);
         }
